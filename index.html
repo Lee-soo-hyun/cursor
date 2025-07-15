@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>학교 급식 조회</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>학교 급식 조회</h1>
+    <form id="searchForm">
+      <label for="schoolName">학교명</label>
+      <input type="text" id="schoolName" name="schoolName" required autocomplete="off" value="광문고등학교">
+      <button type="submit">학교 검색</button>
+    </form>
+    <div id="schoolSelectArea" style="display:none;">
+      <label for="schoolSelect">학교 선택</label>
+      <select id="schoolSelect"></select>
+    </div>
+    <form id="mealForm" style="display:none;">
+      <label for="mealCode">식사코드 (MMEAL_SC_CODE, 선택)</label>
+      <input type="text" id="mealCode" name="mealCode">
+      <label for="date">급식일자 (MLSV_YMD, 선택, YYYYMMDD)</label>
+      <input type="text" id="date" name="date">
+      <button type="submit">급식 조회</button>
+    </form>
+    <div id="result"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
