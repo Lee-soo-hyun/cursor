@@ -1,15 +1,11 @@
-// API 키를 api.txt에서 읽어오는 함수
-async function getApiKey() {
-  const res = await fetch('api.txt');
-  const key = (await res.text()).trim();
-  return key;
-}
+// NEIS OpenAPI 키를 코드 내에 직접 상수로 선언
+const API_KEY = '6fcb21a1a40940eeab06ef6148822823';
 
 // 학교명으로 학교 검색 (NEIS OpenAPI)
-async function searchSchoolByName(schoolName, apiKey) {
+async function searchSchoolByName(schoolName) {
   const baseUrl = 'https://open.neis.go.kr/hub/schoolInfo';
   const params = [
-    `KEY=${apiKey}`,
+    `KEY=${API_KEY}`,
     'Type=json',
     `SCHUL_NM=${encodeURIComponent(schoolName)}`
   ];
@@ -22,15 +18,14 @@ async function searchSchoolByName(schoolName, apiKey) {
 }
 
 // 급식 정보 조회 함수
-async function fetchMeal({ officeCode, schoolCode, mealCode, date, apiKey }) {
+async function fetchMeal({ officeCode, schoolCode, date }) {
   const baseUrl = 'https://open.neis.go.kr/hub/mealServiceDietInfo';
   const params = [
-    `KEY=${apiKey}`,
+    `KEY=${API_KEY}`,
     'Type=json',
     `ATPT_OFCDC_SC_CODE=${encodeURIComponent(officeCode)}`,
     `SD_SCHUL_CODE=${encodeURIComponent(schoolCode)}`
   ];
-  if (mealCode) params.push(`MMEAL_SC_CODE=${encodeURIComponent(mealCode)}`);
   if (date) params.push(`MLSV_YMD=${encodeURIComponent(date)}`);
   const url = `${baseUrl}?${params.join('&')}`;
   const res = await fetch(url);
@@ -65,7 +60,6 @@ window.addEventListener('DOMContentLoaded', () => {
   const resultDiv = document.getElementById('result');
 
   let selectedSchool = null;
-  let apiKey = null;
 
   // 학교명 검색 함수 (공통화)
   async function doSchoolSearch(schoolName) {
@@ -77,8 +71,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!schoolName) return;
     resultDiv.innerHTML = '학교 검색 중...';
     try {
-      if (!apiKey) apiKey = await getApiKey();
-      const schools = await searchSchoolByName(schoolName, apiKey);
+      const schools = await searchSchoolByName(schoolName);
       if (schools.length === 0) {
         resultDiv.innerHTML = '<span style="color:red">학교를 찾을 수 없습니다.</span>';
         return;
@@ -125,15 +118,12 @@ window.addEventListener('DOMContentLoaded', () => {
       resultDiv.innerHTML = '<span style="color:red">학교를 먼저 선택하세요.</span>';
       return;
     }
-    const mealCode = mealForm.mealCode.value.trim();
     const date = mealForm.date.value.trim();
     try {
       const data = await fetchMeal({
         officeCode: selectedSchool.ATPT_OFCDC_SC_CODE,
         schoolCode: selectedSchool.SD_SCHUL_CODE,
-        mealCode,
-        date,
-        apiKey
+        date
       });
       resultDiv.innerHTML = renderMealResult(data);
     } catch (err) {
